@@ -1,17 +1,35 @@
-const UserInput = () => {
+import { useState } from 'react';
+
+const initialUserInput = {
+  'current-savings': 10000,
+  'yearly-contribution': 1200,
+  'expected-return': 7,
+  duration: 10,
+};
+
+const UserInput = (props) => {
+  const [userInput, setUserInput] = useState(initialUserInput);
+
   const submitHandler = (event) => {
     event.preventDefault();
 
-    console.log('Submit');
+    props.onCalculate(userInput);
   };
 
   const resetHandler = () => {
-    console.log('Reset');
+    setUserInput(initialUserInput);
   };
 
   // 제네릭 이벤트 핸들러 : Input의 onChangeHandler를 하나의 함수로 처리
   const inputChangeHandler = (input, value) => {
-    console.log(input, value);
+    // 이전 값 상태 업데이트, prevInput (이전 값)
+    setUserInput((prevInput) => {
+      return {
+        ...prevInput,
+        // [] 이용해 식별자로써 프로퍼티의 접근 가능
+        [input]: value,
+      };
+    });
   };
 
   return (
@@ -24,6 +42,7 @@ const UserInput = () => {
               inputChangeHandler('current-savings', event.target.value)
             }
             type='number'
+            value={userInput['current-savings']}
             id='current-savings'
           />
         </p>
@@ -33,6 +52,7 @@ const UserInput = () => {
             onChange={(event) =>
               inputChangeHandler('yearly-contribution', event.target.value)
             }
+            value={userInput['yearly-contribution']}
             type='number'
             id='yearly-contribution'
           />
@@ -47,6 +67,7 @@ const UserInput = () => {
             onChange={(event) =>
               inputChangeHandler('expected-return', event.target.value)
             }
+            value={userInput['expected-return']}
             type='number'
             id='expected-return'
           />
@@ -54,6 +75,7 @@ const UserInput = () => {
         <p>
           <label htmlFor='duration'>Investment Duration (years)</label>
           <input
+            value={userInput['duration']}
             type='number'
             onChange={(event) =>
               inputChangeHandler('duration', event.target.value)

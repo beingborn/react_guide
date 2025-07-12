@@ -10,9 +10,9 @@ function App() {
     setUserInput(userInput);
   };
 
-  if (userInput) {
-    const yearlyData = []; // per-year results
+  const yearlyData = [];
 
+  if (userInput) {
     let currentSavings = userInput['current-savings'];
     const yearlyContribution = userInput['yearly-contribution'];
     const expectedReturn = userInput['expected-return'] / 100;
@@ -34,7 +34,14 @@ function App() {
     <div>
       <Header />
       <UserInput onCalculate={calculateHandler} />
-      <ResultTable />
+
+      {!userInput && <p>계산 투자액 없음</p>}
+      {userInput && (
+        <ResultTable
+          data={yearlyData}
+          initialInvestment={userInput['current-savings']}
+        />
+      )}
     </div>
   );
 }

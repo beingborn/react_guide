@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import classes from './UserInput.module.css';
 
 const initialUserInput = {
   'current-savings': 10000,
@@ -27,14 +28,14 @@ const UserInput = (props) => {
       return {
         ...prevInput,
         // [] 이용해 식별자로써 프로퍼티의 접근 가능
-        [input]: value,
+        [input]: +value, // 문자열로 입력한 사용자 입력값을 숫자로 변경
       };
     });
   };
 
   return (
-    <form onSubmit={submitHandler} className='form'>
-      <div className='input-group'>
+    <form onSubmit={submitHandler} className={classes.form}>
+      <div className={classes['input-group']}>
         <p>
           <label htmlFor='current-savings'>Current Savings ($)</label>
           <input
@@ -58,7 +59,7 @@ const UserInput = (props) => {
           />
         </p>
       </div>
-      <div className='input-group'>
+      <div className={classes['input-group']}>
         <p>
           <label htmlFor='expected-return'>
             Expected Interest (%, per year)
@@ -84,11 +85,15 @@ const UserInput = (props) => {
           />
         </p>
       </div>
-      <p className='actions'>
-        <button type='reset' onClick={resetHandler} className='buttonAlt'>
+      <p className={classes.actions}>
+        <button
+          type='reset'
+          onClick={resetHandler}
+          className={classes.buttonAlt}
+        >
           Reset
         </button>
-        <button type='submit' className='button'>
+        <button type='submit' className={classes.button}>
           Calculate
         </button>
       </p>

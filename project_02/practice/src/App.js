@@ -33,12 +33,13 @@ function App() {
       setErrorValid(true)
       setErrorMessage(prevError => ( {
         ...prevError,
-        userName: '한글만 입력하세요.'
+        age: '숫자만 입력하세요.'
       }))
 
       return;
     } 
 
+    console.log(errorMessage)
     handleUserUpdate(value)
   }
 

@@ -19,6 +19,9 @@ const Quiz = () => {
         handleSelectAnswer(null), [handleSelectAnswer]
     )
 
+    console.log("활성 질문" , activeQuestionIndex)
+    console.log("질문 개수" , QUESTIONS.length)
+
     // 답변 완료 시
     if (quizIsComplete) {
         return (
@@ -29,17 +32,24 @@ const Quiz = () => {
         )
     }
 
-    const shuffledAnswers = useMemo(() => {
-        const answers = [...QUESTIONS[activeQuestionIndex].answers];
-        answers.sort(() => Math.random() - 0.5);
-        return answers;
-    }, [activeQuestionIndex]);
-
+    const shuffledAnswers = [...QUESTIONS[activeQuestionIndex].answers]
+    shuffledAnswers.sort(() => Math.random() - 0.5);
 
     return (
         <div id="quiz">
             <div id="question">
-                <QuestionTimer timeout={10000} onTimeout={handleSkipAnswer}/>
+                {/* 
+                    재렌더링 
+                    강제 시키기 
+
+                    1. 리액트는 변경된 부분만 재렌더링하는 특성이 있다.
+                    2. 또한 key 값을 통해 컴포넌트의 유효값을 판단한다
+                */}
+                <QuestionTimer 
+                    key={activeQuestionIndex}
+                    timeout={10000} 
+                    onTimeout={handleSkipAnswer}
+                />
                 <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
                 <ul id="answers">
                     {shuffledAnswers.map((answer) => (

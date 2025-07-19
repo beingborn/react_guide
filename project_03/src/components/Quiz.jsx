@@ -4,13 +4,28 @@ import quizCompleteImg from '../assets/quiz-complete.png'
 import QuestionTimer from "./QuestionTimer.jsx"
 
 const Quiz = () => {
+    const [answerState, setAnswerState] = useState('')
     const [userAnswers, setUserAnswers] = useState([]); // 유저 답변 목록
     const activeQuestionIndex = userAnswers.length; // 활성화된 질문의 순서 1,2,3
     const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
 
-    const handleSelectAnswer = useCallback(
-        function handleSelectAnswer(selectedAnswer) {
+    const handleSelectAnswer = useCallback( function handleSelectAnswer(
+        selectedAnswer
+    ) {
+            setAnswerState('answered')
             setUserAnswers((prevUserAnswers) => [...prevUserAnswers, selectedAnswer] );
+
+            console.log(selectedAnswer)
+            console.log(QUESTIONS[activeQuestionIndex].answers[0])
+
+            setTimeout(() => {
+                console.log(QUESTIONS[activeQuestionIndex])
+                if (selectedAnswer === QUESTIONS[activeQuestionIndex].answers[0]) {
+                    setAnswerState('correct')
+                } else {
+                    setAnswerState('wrong')
+                }
+            }, 1000)
         }
         , []
     ) 
@@ -18,9 +33,6 @@ const Quiz = () => {
     const handleSkipAnswer = useCallback(() => 
         handleSelectAnswer(null), [handleSelectAnswer]
     )
-
-    console.log("활성 질문" , activeQuestionIndex)
-    console.log("질문 개수" , QUESTIONS.length)
 
     // 답변 완료 시
     if (quizIsComplete) {

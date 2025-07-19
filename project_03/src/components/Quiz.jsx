@@ -1,12 +1,20 @@
-import { useState, useMemo, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
 import QUESTIONS from '../questions.js'
 import quizCompleteImg from '../assets/quiz-complete.png'
 import QuestionTimer from "./QuestionTimer.jsx"
 
 const Quiz = () => {
+    const shuffledAnswers = useRef();
     const [answerState, setAnswerState] = useState('')
     const [userAnswers, setUserAnswers] = useState([]); // 유저 답변 목록
-    const activeQuestionIndex = userAnswers.length; // 활성화된 질문의 순서 1,2,3
+
+    /** 
+     * 활성화된 질문의 순서 1,2,3
+     * 답변이 바로 넘어가지않게 하는 방법 => 유저 현재 CurrentState 값이 빈 값이라면
+     * userAnswers.length - 1을 할당해 이전 질문을 유지하도록 한다.
+     * */  
+    const activeQuestionIndex = answerState === '' ? userAnswers.length : userAnswers.length - 1 ;
+    
     const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
 
     const handleSelectAnswer = useCallback( function handleSelectAnswer(
@@ -15,19 +23,19 @@ const Quiz = () => {
             setAnswerState('answered')
             setUserAnswers((prevUserAnswers) => [...prevUserAnswers, selectedAnswer] );
 
-            console.log(selectedAnswer)
-            console.log(QUESTIONS[activeQuestionIndex].answers[0])
-
             setTimeout(() => {
-                console.log(QUESTIONS[activeQuestionIndex])
                 if (selectedAnswer === QUESTIONS[activeQuestionIndex].answers[0]) {
                     setAnswerState('correct')
                 } else {
                     setAnswerState('wrong')
                 }
+
+                setTimeout(() => {
+                    setAnswerState('') // 문자열 초기화
+                }, 2000)
             }, 1000)
         }
-        , []
+        , [activeQuestionIndex]
     ) 
 
     const handleSkipAnswer = useCallback(() => 
@@ -44,8 +52,10 @@ const Quiz = () => {
         )
     }
 
-    const shuffledAnswers = [...QUESTIONS[activeQuestionIndex].answers]
-    shuffledAnswers.sort(() => Math.random() - 0.5);
+    if (!shuffledAnswers.current) {
+        shuffledAnswers.current = [...QUESTIONS[activeQuestionIndex].answers]
+        shuffledAnswers.current.sort(() => Math.random() - 0.5);
+    }
 
     return (
         <div id="quiz">
@@ -64,11 +74,32 @@ const Quiz = () => {
                 />
                 <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
                 <ul id="answers">
-                    {shuffledAnswers.map((answer) => (
-                        <li className="answer" key={answer}>
-                            <button onClick={() => handleSelectAnswer(answer)}>{answer}</button>
-                        </li>
-                    ))}
+                    {shuffledAnswers.current.map((answer) => {
+                        /**
+                         * userAnswers === 유저 답변 목록 
+                         * userAnswers.length === 현재 유저가 답변한 질문의 개수 
+                         * userAnswers.length - 1 인 이유 === 유저가 첫번째 질문 답변 시 
+                         * userAnswers[0]에 저장 질문의 개수는 1개가 되기 때문
+                         */
+
+                        const isSelected = userAnswers[userAnswers.length - 1] === answer;
+                        let cssClass = '';
+
+                        if (answerState === 'answered' && isSelected) {
+                            cssClass = 'selected'
+                        } 
+
+                        if ((answerState === 'correct' || answerState === 'wrong') && isSelected) {
+                            cssClass = answerState;
+                        }
+
+                            return (
+                                <li className="answer" key={answer}>
+                                    <button onClick={() => handleSelectAnswer(answer)} className={cssClass}>{answer}</button>
+                                </li>    
+                            )
+                        })
+                    }
                 </ul>
             </div>
         </div>
@@ -96,4 +127,9 @@ export default Quiz
 /**
  * useCallback 사용 이유 
  * 주변 컴포넌트가 다시 실행되었다 해도 함수가 재생성 되지 않도록 함
+ */
+
+/** 
+ * useRef 사용 이유 
+ * 각자 속하는 컴포넌트 라이프 사이클로부터 독립적인 값을 관리하고 참조하기 위해
  */

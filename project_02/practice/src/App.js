@@ -39,7 +39,6 @@ function App() {
       return;
     } 
 
-    console.log(errorMessage)
     handleUserUpdate(value)
   }
 

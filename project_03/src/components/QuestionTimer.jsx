@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const QuestionTimer = ({ timeout, onTimeout }) => {
+const QuestionTimer = ({ timeout, onTimeout, mode }) => {
     const [remainingTime, setRemainingTime] = useState(timeout);
 
     // 주요 개념 : Clean 업을 통해 컴포넌트 언마운트 시 이전 타이머 삭제 후 재시작
@@ -21,7 +21,7 @@ const QuestionTimer = ({ timeout, onTimeout }) => {
     }, [remainingTime])
 
 
-    return <progress id="question-time" max={timeout} value={remainingTime}/>;
+    return <progress id="question-time" max={timeout} value={remainingTime} className={mode}/>;
 }
 
 export default QuestionTimer;

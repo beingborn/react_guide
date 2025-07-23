@@ -1,41 +1,25 @@
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback } from "react"
 import QUESTIONS from '../questions.js'
 import quizCompleteImg from '../assets/quiz-complete.png'
-import QuestionTimer from "./QuestionTimer.jsx"
+import Question from "./Question.jsx"
 
 const Quiz = () => {
-    const shuffledAnswers = useRef();
     const [answerState, setAnswerState] = useState('')
     const [userAnswers, setUserAnswers] = useState([]); // 유저 답변 목록
-
+    const activeQuestionIndex = 
+    answerState === '' ? userAnswers.length : userAnswers.length - 1 ;
+    
     /** 
      * 활성화된 질문의 순서 1,2,3
      * 답변이 바로 넘어가지않게 하는 방법 => 유저 현재 CurrentState 값이 빈 값이라면
      * userAnswers.length - 1을 할당해 이전 질문을 유지하도록 한다.
-     * */  
-    const activeQuestionIndex = answerState === '' ? userAnswers.length : userAnswers.length - 1 ;
-    
+     * */      
     const quizIsComplete = activeQuestionIndex === QUESTIONS.length;
 
-    const handleSelectAnswer = useCallback( function handleSelectAnswer(
-        selectedAnswer
-    ) {
-            setAnswerState('answered')
+    const handleSelectAnswer = useCallback( function handleSelectAnswer(selectedAnswer) {
             setUserAnswers((prevUserAnswers) => [...prevUserAnswers, selectedAnswer] );
-
-            setTimeout(() => {
-                if (selectedAnswer === QUESTIONS[activeQuestionIndex].answers[0]) {
-                    setAnswerState('correct')
-                } else {
-                    setAnswerState('wrong')
-                }
-
-                setTimeout(() => {
-                    setAnswerState('') // 문자열 초기화
-                }, 2000)
-            }, 1000)
         }
-        , [activeQuestionIndex]
+        , []
     ) 
 
     const handleSkipAnswer = useCallback(() => 
@@ -49,59 +33,17 @@ const Quiz = () => {
                 <img src={quizCompleteImg} alt="퀴즈 종료 이미지" />
                 <h2>퀴즈 종료!</h2>
             </div>
-        )
-    }
-
-    if (!shuffledAnswers.current) {
-        shuffledAnswers.current = [...QUESTIONS[activeQuestionIndex].answers]
-        shuffledAnswers.current.sort(() => Math.random() - 0.5);
+        ) 
     }
 
     return (
         <div id="quiz">
-            <div id="question">
-                {/* 
-                    재렌더링 
-                    강제 시키기 
-
-                    1. 리액트는 변경된 부분만 재렌더링하는 특성이 있다.
-                    2. 또한 key 값을 통해 컴포넌트의 유효값을 판단한다
-                */}
-                <QuestionTimer 
-                    key={activeQuestionIndex}
-                    timeout={10000} 
-                    onTimeout={handleSkipAnswer}
-                />
-                <h2>{QUESTIONS[activeQuestionIndex].text}</h2>
-                <ul id="answers">
-                    {shuffledAnswers.current.map((answer) => {
-                        /**
-                         * userAnswers === 유저 답변 목록 
-                         * userAnswers.length === 현재 유저가 답변한 질문의 개수 
-                         * userAnswers.length - 1 인 이유 === 유저가 첫번째 질문 답변 시 
-                         * userAnswers[0]에 저장 질문의 개수는 1개가 되기 때문
-                         */
-
-                        const isSelected = userAnswers[userAnswers.length - 1] === answer;
-                        let cssClass = '';
-
-                        if (answerState === 'answered' && isSelected) {
-                            cssClass = 'selected'
-                        } 
-
-                        if ((answerState === 'correct' || answerState === 'wrong') && isSelected) {
-                            cssClass = answerState;
-                        }
-
-                            return (
-                                <li className="answer" key={answer}>
-                                    <button onClick={() => handleSelectAnswer(answer)} className={cssClass}>{answer}</button>
-                                </li>    
-                            )
-                        })
-                    }
-                </ul>
-            </div>
+            <Question 
+                key={activeQuestionIndex}
+                index={activeQuestionIndex}
+                onSelectAnswer={handleSelectAnswer}
+                onSkipAnswer={handleSkipAnswer}
+            />
         </div>
     
     )

@@ -1,5 +1,5 @@
 # React 완벽가이드 2025 Udemy 예제 프로젝트   
-> React, Next.js
+> 활용 기술 : React, Next.js
   
 **프로젝트 상세**  
 1. 환율 계산 프로젝트 
